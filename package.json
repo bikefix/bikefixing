@@ -16,10 +16,15 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "crypo.js": "^1.0.8",
+    "firebase": "^10.13.0",
     "pinia": "^2.1.7",
+    "typesense-instantsearch-adapter": "^2.8.0",
     "vue": "^3.4.29",
+    "vue-instantsearch": "^4.19.3",
     "vue-router": "^4.3.3",
-    "vuetify": "^3.7.0"
+    "vuetify": "^3.7.0",
+    "vuex": "^4.1.0"
   },
   "devDependencies": {
     "@rushstack/eslint-patch": "^1.8.0",

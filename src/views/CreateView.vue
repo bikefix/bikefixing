@@ -21,18 +21,11 @@
         <v-btn color="#ed6803" @click="save">Save</v-btn>
       </v-card-actions>
     </v-card>
-    <LoginView />
   </div>
 </template>
 <script setup lang="ts">
 // get id from the route
   import { useRoute } from 'vue-router'
-  import firebase from "firebase/compat/app";
-  //firestore
-  import "firebase/compat/firestore";
-  // Required for side-effects
-  // import "firebase/firestore";
-  import LoginView from './LoginView.vue'
 </script>
 <script lang="ts">
 
@@ -56,30 +49,16 @@
         this.tag = tag
         this.Weight = Weight
       })
-      const that = this
       return {
         title: 'loading...',
         content: 'loading...',
         id: useRoute().params.id,
         save() {
           console.log('saving...')
-          const currentUser = firebase.auth().currentUser
-          console.log(currentUser.uid)
-
-          firebase.firestore().collection('anywhere').doc(that.id).set({
-            title: that.title,
-            content: that.content,
-            url: that.url,
-            image: that.image,
-            tag: that.tag,
-            Weight: that.Weight,
-            published: true, // 
-          })
         },
         image: '',
         url: '',
         Weight: 0,
-        published: true,
       }
     }
   }

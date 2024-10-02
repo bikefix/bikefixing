@@ -117,8 +117,13 @@ function asyncUser(field:string = "uid") {
                 })
                 if (userT.uid || userT.user_id) {
                   const newUser = {uid:userT.user_id, ...userT, ...user}
+                  if (!app.config.globalProperties.user) {
+                    app.config.globalProperties.user = newUser;
+                  }
                   if (newUser[field]) {
                     return resolve(newUser)
+                  } else {
+                    return reject("user dus not have " + field)
                   }
                 }
               }
@@ -367,7 +372,8 @@ app.config.globalProperties.getSearchAdapter = getSearchAdapter
 app.config.globalProperties.getSig = getSig
 
 // app.mount("#app")
-let timer = setTimeout(() => {
+const timer = setTimeout(() => {
+  app.config.globalProperties.user = false;
   app.mount("#app");
 }, 1000);
 asyncUser("ts_nodes").then((user) => {
@@ -377,6 +383,7 @@ asyncUser("ts_nodes").then((user) => {
     console.log("search client loaded");
   }
   console.log("user", user);
+  app.config.globalProperties.user = user;
 }).catch((e) => {
   console.error(e);
 }).finally(()=>{

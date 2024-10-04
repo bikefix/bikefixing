@@ -11,7 +11,7 @@ import 'firebaseui/dist/firebaseui.css'
 import { defineComponent, onMounted } from 'vue'
 
 </script>
-<script>
+<script lang="ts">
 export default defineComponent({
   name: 'login',
   setup() {

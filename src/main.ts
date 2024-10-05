@@ -253,7 +253,7 @@ app.config.globalProperties.saveUser = function (user, fs) {
         console.error(e);
     }
 }
-app.config.globalProperties.getData = function (cb: Function) {
+app.config.globalProperties.getData = function (cb: Function = ()=>{}) {
     const requestURL = "https://bikefix-248611.firebaseio.com/pages.json";
     let request = new XMLHttpRequest();
     request.open("GET", requestURL);

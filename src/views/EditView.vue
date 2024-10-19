@@ -12,10 +12,36 @@
         
         <v-text-field label="url" v-model="url"></v-text-field>
 
-        <v-text-field label="image" v-model="image"></v-text-field>
+        <v-text-field label="image" 
+          v-model="image" 
+          append-inner-icon="mdi-upload"
+          @click:append-inner="showDialog"
+        ></v-text-field>
+        <dialog id="upload" persistent max-width="290">
+          <v-card>
+            <v-card-title>
+              <span class="headline">Upload Image</span>
+            </v-card-title>
+            <v-card-text>
+              <v-file-input
+                id="file-upload"
+                v-model="file"
+                accept="image/*"
+                show-size
+                show-file-size
+              ></v-file-input>
+            </v-card-text>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn color="blue darken-1" text @click="hideDialog">Close</v-btn>
+              <v-btn color="blue darken-1" text @click="upload">Upload</v-btn>
+            </v-card-actions>
+          </v-card>
+        </dialog>
+        <img :src="image" style="max-width:100%" />
         <v-text-field label="tags" v-model="tag"></v-text-field>
         <v-text-field label="Weight" v-model="Weight" type="number"></v-text-field>
-        
+         
       </v-card-text>
       <v-card-actions>
         <v-btn color="#ed6803" @click="save">Save</v-btn>
@@ -30,6 +56,7 @@
   import firebase from "firebase/compat/app";
   //firestore
   import "firebase/compat/firestore";
+  import "firebase/compat/storage";
   // Required for side-effects
   // import "firebase/firestore";
   import LoginView from './LoginView.vue'
@@ -80,7 +107,31 @@
         url: '',
         Weight: 0,
         published: true,
+        tag: '',
+        file: null,
       }
+    },
+    methods: {
+      upload() {
+        const file = document.getElementById('file-upload').files[0]
+        const storageRef = firebase.storage().ref("pub")
+        const fileRef = storageRef.child(file.name)
+        fileRef.put(file).then(() => {
+          console.log('Uploaded a file')
+          fileRef.getDownloadURL().then(url => {
+            console.log(url)
+            // this.image = url
+          })
+        })
+      },
+      showDialog() {
+        const dialog = document.getElementById('upload')
+        dialog.showModal()
+      },
+      hideDialog() {
+        const dialog = document.getElementById('upload')
+        dialog.close()
+      },
     }
   }
 

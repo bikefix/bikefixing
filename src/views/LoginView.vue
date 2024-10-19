@@ -1,6 +1,9 @@
 <template>
-  <div id="firebaseui-auth-container" v-if="!user">
-    <h1>login</h1>
+  <div id="firebaseui-auth-container" v-if="show"> </div>
+  <div v-else > 
+    You are loggin in as {{user.displayName}}
+    <btn @click="logout">Logout</btn>
+
   </div>
 </template>
 <script setup lang="ts">
@@ -13,35 +16,55 @@ import 'firebaseui/dist/firebaseui.css'
 </script>
 <script lang="ts">
 
-const firebaseConfig = {
-  apiKey: "AIzaSyCn21vUBcaJn5MxXYJb5NbyoMr8XV1gjP8",
-  authDomain: "bikefix-248611.firebaseapp.com",
-  databaseURL: "https://bikefix-248611.firebaseio.com",
-  projectId: "bikefix-248611",
-  storageBucket: "bikefix-248611.appspot.com",
-  messagingSenderId: "472007851446",
-  appId: "1:472007851446:web:e6cd7d1b36344b01079517"
-};
-
-firebase.initializeApp(firebaseConfig)
 
 export default {
+  name: 'login',
+  data() {
+    return {
+      show: !firebase.auth().currentUser
+    }
+  },
   mounted() {
-    const ui = new firebaseui.auth.AuthUI(firebase.auth());
-    ui.start('#firebaseui-auth-container', {
-      signInOptions: [
-        firebase.auth.EmailAuthProvider.PROVIDER_ID,
-        firebase.auth.GoogleAuthProvider.PROVIDER_ID,
-        firebase.auth.PhoneAuthProvider.PROVIDER_ID,
-      ],
-      signInSuccessUrl: '/',
-      signInFlow: 'popup',
-      tosUrl: '/',
-      privacyPolicyUrl: '/'
-    });
+    if (firebase.auth().currentUser) {
+      return this.show = false
+    }
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) {
+        console.log('logged in', user)
+        this.show = false
+      }
+    })
+    this.init()
+  },
+  methods: {
+    logout() {
+      firebase.auth().signOut().then(() => {
+        console.log('logged out')
+        this.show = true
+        this.init()
+      })
+    },
+    init() {
+      const ui = new firebaseui.auth.AuthUI(firebase.auth())
+      let path = this.$route.path
+  
+      if (path === '/login') {
+        path = '/'
+      }
+      ui.start('#firebaseui-auth-container', {
+        signInOptions: [
+          firebase.auth.EmailAuthProvider.PROVIDER_ID,
+          firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+          firebase.auth.PhoneAuthProvider.PROVIDER_ID,
+        ],
+        signInSuccessUrl: path,
+        signInFlow: 'popup',
+        tosUrl: '/',
+        privacyPolicyUrl: '/'
+      });
+    }
   }
 }
-
 </script>
 <style>
 </style>

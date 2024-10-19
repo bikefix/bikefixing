@@ -1,0 +1,73 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if false;
+    }
+    match /files/{fid} {
+      allow create: if request.auth != null;
+      allow write : if request.auth != null;
+      allow read  : if request.auth.token.permissions.bikeshop.bfx.jobs.get == true;
+      allow read  : if resource.data.customMetadata[request.auth.uid] == 'UserID';
+      allow update: if request.auth.token.permissions.bikeshop.bfx.jobs.get == true;
+    }
+    match /htmlToPrint/{printId} {
+      allow create, read, update, delete, write: if request.auth.token.permissions.bikeshop.bfx.jobs.get == true;
+    }
+    match /users/{userId} {
+      allow read, update, delete: if request.auth.uid == userId;
+      allow read: if request.auth.token.permissions.bikeshop.bfx.jobs.get == true;
+      allow read: if resource.data.public == true;
+      allow create: if request.auth.uid != null;
+    }
+    match /users/{userId}/jobs/{jobsId} {
+      allow create, read, update, delete, write: if request.auth.uid == userId;
+    }
+    match /users/{userId}/jobs/{jobsId}/versions/{vid} {
+      allow read: if request.auth.uid == userId;
+    }
+    match /users/{userId}/bike/{bikeId} {
+      allow create, read, update, delete, write: if request.auth.uid == userId;
+    }
+    match /users/{userId}/permissions {
+      allow read: if request.auth.uid == userId;
+      allow create, update, write, delete: if false;
+    }
+    match /{path=**}/jobs/{jobId} {
+      allow read, write: if request.auth.token.permissions.bikeshop.bfx.jobs.get == true;
+    }
+    match /{path=**}/jobs/{jobId}/versions/{vid} {
+      allow read: if request.auth.token.permissions.bikeshop.bfx.jobs.get == true;
+    }
+    match /users/{userId}/history/{id} {
+      allow read, create : if request.auth.uid == userId;
+      allow  update, write, delete: if false;
+    }
+    match /users/{userId}/bikes/{id} { 
+      allow read, write: if request.auth.token.permissions.bikeshop.bfx.jobs.get == true;
+      allow update, write, read, create : if request.auth.uid == userId;
+      allow  delete: if false;
+    }
+    match /bikeshop/{shopId} {
+      match /parts/{id} {
+        allow read, write: if request.auth.token.permissions.bikeshop[shopId].jobs.get == true;
+      }
+      match /emails/{id} {
+        allow read, write: if request.auth.token.permissions.bikeshop[shopId].jobs.get == true;
+      }
+      match /content/{id} {
+        allow read, write: if request.auth.token.permissions.bikeshop[shopId].jobs.get == true;
+      }
+      match /team/{id} {
+        allow read, write: if request.auth.token.permissions.bikeshop[shopId].jobs.get == true;
+      }
+      match /suppliers/{id} {
+        allow read, write: if request.auth.token.permissions.bikeshop[shopId].jobs.get == true;
+      }
+    }
+    match /anywhere/{id} {
+      allow read, write: if request.auth.token.permissions.bikeshop.bfx.jobs.get == true;
+    }
+  }
+}
+

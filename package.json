@@ -16,6 +16,7 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "@mdi/font": "^7.4.47",
     "crypo.js": "^1.0.8",
     "firebase": "^10.13.0",
     "firebaseui": "^6.1.0",

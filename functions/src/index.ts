@@ -1,5 +1,5 @@
 import * as functions from "firebase-functions/v1";
-// const functions = require("firebase-functions/v1");
+// const functions = require("firebase-functions/v1")
 import * as Typesense from "typesense";
 import {initializeApp} from "firebase-admin/app";
 import {getFirestore} from "firebase-admin/firestore";
@@ -190,6 +190,6 @@ exports.updateTypesenceJobs = functions.region("europe-west2").
       return typesense.collections("jobs").documents(id).update(job);
     });
     
-exports.users = require("./users")
-exports.sync  = require("./sync")
 
+//exports.users = require("./users")
+//exports.sync  = require("./sync")

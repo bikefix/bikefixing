@@ -12,9 +12,25 @@ import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
 import SimpleIDB from "./simpleIDB"
 import store from "./store"
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/firestore';
+
+import '@mdi/font/css/materialdesignicons.css'
 
 
-const app = createApp(App)
+
+firebase.initializeApp({
+  apiKey: "AIzaSyCn21vUBcaJn5MxXYJb5NbyoMr8XV1gjP8",
+  authDomain: "bikefix-248611.firebaseapp.com",
+  databaseURL: "https://bikefix-248611.firebaseio.com",
+  projectId: "bikefix-248611",
+  storageBucket: "bikefix-248611.appspot.com",
+  messagingSenderId: "472007851446",
+  appId: "1:472007851446:web:e6cd7d1b36344b01079517",
+});
+
+const fs = firebase.firestore();
+
 
 const vuetify = createVuetify({
   components,
@@ -26,6 +42,7 @@ let dataGot = {
     d:false,
 }
 
+const app = createApp(App)
 
 import InstantSearch from 'vue-instantsearch/vue3/es'
 import TypesenseInstantSearchAdapter from 'typesense-instantsearch-adapter'
@@ -148,6 +165,7 @@ function asyncUser(field:string = "uid") {
 app.config.globalProperties.asyncUser = asyncUser
 app.config.globalProperties.SimpleIDB = SimpleIDB
 app.config.globalProperties.noVowels = noVowels
+app.config.globalProperties.fs = fs
 app.config.globalProperties.money = function (c:any) {
   if (typeof c === "string") {
     c = c.replace("£", "")
@@ -226,7 +244,7 @@ app.config.globalProperties.sortObj = function (obj) {
             return a;
         }, {});
 }
-app.config.globalProperties.saveUser = function (user, fs) {
+app.config.globalProperties.saveUser = function (user) {
     let uid = user.uid;
     delete user.token;
     delete user.uid;
@@ -254,36 +272,49 @@ app.config.globalProperties.saveUser = function (user, fs) {
     }
 }
 app.config.globalProperties.getData = function (cb: Function = ()=>{}) {
-    const requestURL = "https://bikefix-248611.firebaseio.com/pages.json";
-    let request = new XMLHttpRequest();
-    request.open("GET", requestURL);
-    request.responseType = "json";
-    request.onload = function () {
-      if (request.response) {
-          dataGot.d = true;
-          app.config.globalProperties.SimpleIDB.set("d", request.response);
-          store.commit("pages", request.response);
-          if (cb) cb(request.response);
-      }
-    };
-    if (window.navigator.onLine && !dataGot.d) {
-      try {
-          request.send();
-      } catch (e) {
-          console.error(e);
-      }
-    }
-    return app.config.globalProperties.SimpleIDB.get("d").then((d) => {
-      if (d) {
-          if (cb) cb(d);
-          if (d.pages) {
-              store.commit("pages", d.pages);
-          } else {
-              store.commit("pages", d);
-          }
-      }
-      return d;
+  // get data from firebase firestore
+  fs.collection("anywhere").where("published", "!=", false).onSnapshot((snapshot) => {
+    let data = {};
+    snapshot.forEach((doc) => {
+      data[doc.id] = doc.data();
     });
+    console.log("data", data);
+    store.commit("pages", data);
+    app.config.globalProperties.SimpleIDB.set("d", data);
+    if (cb) cb(data);
+  })
+
+
+  /* const requestURL = "https://bikefix-248611.firebaseio.com/pages.json";
+  let request = new XMLHttpRequest();
+  request.open("GET", requestURL);
+  request.responseType = "json";
+  request.onload = function () {
+    if (request.response) {
+      dataGot.d = true;
+      app.config.globalProperties.SimpleIDB.set("d", request.response);
+      store.commit("pages", request.response);
+      if (cb) cb(request.response);
+    }
+  };
+  if (window.navigator.onLine && !dataGot.d) {
+    try {
+        request.send();
+    } catch (e) {
+        console.error(e);
+    } 
+  } */
+  return app.config.globalProperties.SimpleIDB.get("d").then((d) => {
+    if (d) {
+        if (cb) cb(d);
+        if (d.pages) {
+            store.commit("pages", d.pages);
+        } else {
+            store.commit("pages", d);
+        }
+    }
+    return d;
+  });
 }
 app.config.globalProperties.debounce = function (func, wait = 500, immediate) {
   var timeout;

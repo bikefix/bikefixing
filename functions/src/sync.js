@@ -5,12 +5,14 @@
 
 const functions = require('firebase-functions/v1')
 const admin = require('firebase-admin')
+admin.initializeApp()
 const db = admin.database().ref('pages')
 const dbParts = admin.database().ref('parts')
 // const cleaner = require('clean-html')
 // const options = {
 //  'add-remove-tags': ['span',]
 // }
+
 exports.fireDeletePages = functions.firestore.document('/anywhere/{pageId}').onDelete(snap => {
   const pageId = snap.id
   return db.child(pageId).set(null)
